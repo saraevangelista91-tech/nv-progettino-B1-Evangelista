@@ -143,6 +143,13 @@ Dopo il secondo ping da ns1 a ns2 vengono scambiati subito pacchetti ICMP poich�
 miglioreresti, eventuali domande aperte. Non è un riempitivo: è la
 parte che meglio mostra che hai capito ciò che hai fatto.)
 
+- Cosa succede se assegno a ns2 un IP fuori dalla /24 di ns1 (es. 10.0.2.20/24)? essendo su reti diversi, 10.0.2.20/24 non è raggiungibile, se non tramite router
+<img width="571" height="57" alt="image" src="https://github.com/user-attachments/assets/167b4e54-fd54-4699-91b3-95fc20c880ed" />
+
+- E se invece dimentico di mettere su up una delle due interfacce? Cosa vede ping e cosa vede tcpdump (sull'altro lato)? se un lato è down, è come se il cavo virtuale fosse scollegato da una parte. Il ping da ns1 a ns2 fa inviare un pacchetto ARP-Request da ns1 che però non viene ricevuto da ns2 e il ping fallisce per mancanza di ARP reply. tcpdump su ns2 non cattura nulla perchè non riceve nulla
+Tra il primo e il secondo ping, dopo quanto tempo la cache ARP si "scorda" l'entry, e da cosa dipende? (cenni a arp_table_timeout, gc_thresh).
+Questo schema (due namespace direttamente connessi) è quello che usa Docker quando crea due container nella stessa rete bridge di default? Quasi, ma c'è un pezzo in più — quale? (Spoiler: il bridge Linux fa da switch.)
+
 ## 7. Riferimenti
 
 (Link a documentazione ufficiale, articoli, slide del corso, guide
