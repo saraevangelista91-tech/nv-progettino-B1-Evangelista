@@ -7,7 +7,6 @@
 ## 1. Obiettivo
 
 Capire a basso livello come funziona la comunicazione fra due network namespace direttamente connessi da una coppia veth, e in particolare leggere "in diretta" il traffico che passa con tcpdump/Wireshark per riconoscere i protocolli che entrano in gioco prima ancora dell'ICMP: la richiesta e la risposta ARP.
-(2-4 righe: cosa fa il progettino e perché. Un paragrafo, niente liste.)
 
 ## 2. Architettura
 
@@ -147,11 +146,11 @@ parte che meglio mostra che hai capito ciò che hai fatto.)
 <img width="571" height="57" alt="image" src="https://github.com/user-attachments/assets/167b4e54-fd54-4699-91b3-95fc20c880ed" />
 
 - E se invece dimentico di mettere su up una delle due interfacce? Cosa vede ping e cosa vede tcpdump (sull'altro lato)? se un lato è down, è come se il cavo virtuale fosse scollegato da una parte. Il ping da ns1 a ns2 fa inviare un pacchetto ARP-Request da ns1 che però non viene ricevuto da ns2 e il ping fallisce per mancanza di ARP reply. tcpdump su ns2 non cattura nulla perchè non riceve nulla
-Tra il primo e il secondo ping, dopo quanto tempo la cache ARP si "scorda" l'entry, e da cosa dipende? (cenni a arp_table_timeout, gc_thresh).
-Questo schema (due namespace direttamente connessi) è quello che usa Docker quando crea due container nella stessa rete bridge di default? Quasi, ma c'è un pezzo in più — quale? (Spoiler: il bridge Linux fa da switch.)
+
+- Tra il primo e il secondo ping, dopo quanto tempo la cache ARP si "scorda" l'entry, e da cosa dipende? (cenni a arp_table_timeout, gc_thresh). La cache ARP non viene dimenticata subito dopo il primo ping: Linux mantiene l’associazione IP-MAC per un certo tempo in stato REACHABLE (tipicamente ~30 s, controllato da base_reachable_time_ms). Dopo questo periodo l’entry diventa STALE: può ancora essere usata, ma al successivo traffico Linux può inviare una nuova ARP Request per verificare che il MAC sia ancora valido. La pulizia automatica della tabella dipende anche dai parametri di garbage collection (gc_stale_time, gc_thresh1/2/3), che controllano quando le entry vecchie vengono eliminate e quanti record ARP il kernel può mantenere.
+
+- Questo schema (due namespace direttamente connessi) è quello che usa Docker quando crea due container nella stessa rete bridge di default? Quasi, ma c'è un pezzo in più — quale? (Spoiler: il bridge Linux fa da switch.)
 
 ## 7. Riferimenti
+slide del corso itp-2526-HandsOn
 
-(Link a documentazione ufficiale, articoli, slide del corso, guide
-dei materiali del corso che hai usato.)
-Lunghezza ragionevole: 2-5 pagine una volta renderizzato. Se è molto più corto rischi di non avere abbastanza dettaglio per riprodurre il lavoro; se è molto più lungo, probabilmente stai scrivendo prosa che la demo mostra meglio.
