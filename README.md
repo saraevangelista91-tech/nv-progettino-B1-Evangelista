@@ -85,10 +85,12 @@ exit #ritorno nel root
 sudo su #entro in modalità super user
 ip netns exec ns1 /bin/bash #entro dentro ns1
 ip netns exec ns1 ip neigh flush dev veth-ns1 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria 
+ip neigh show
 #apro una shell per ns2
 sudo su #entro in modalità super user
 ip netns exec ns2 /bin/bash #entro dentro ns2
 ip netns exec ns2 ip neigh flush dev veth-ns2 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria
+ip neigh show
 
 Cattura del primo ping
 #shell ns2
@@ -129,7 +131,7 @@ Pacchetto 3 ICMP-ECO request: ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) testa l
 Pacchetto 4 ICMP-ECO reply: ns2 (IP 10.0.1.20 - MAC 82:89:85:5e:d0:46) risponde positivamente a ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) rimandando indietro lo stesso contenuto
 <img width="1894" height="746" alt="image" src="https://github.com/user-attachments/assets/a4e812c1-722a-4107-827b-3ad7a5eb98e8" />
 
-Stessa cose per i pacchetti successivi 5-6 e 7-8
+Stessa cosa per i pacchetti successivi 5-6 e 7-8
 <img width="1299" height="213" alt="image" src="https://github.com/user-attachments/assets/32f4ea92-7ba8-43b0-bf3a-1f08cf7c6e97" />
 
 Dopo il secondo ping da ns1 a ns2 vengono scambiati subito pacchetti ICMP poichè l'indirizzo MAC di ns2 è stato salvato da ns1
