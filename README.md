@@ -50,7 +50,9 @@ WSL2 Ubuntu 24.04, Docker Engine, VirtualBox 7.x, ecc. Indicare le versioni.)
 (Sequenza di comandi numerati che, eseguiti su un sistema con i prerequisiti,
 porta dal repo appena clonato allo stato in cui la demo "funziona".
 Ogni comando deve essere COMMENTATO con cosa ci si aspetta in output.)
-ip a #vedo le interfacce create
+#Costruzione dell'architettura
+
+ip a #vedo le interfacce nella wsl
 sudo su #entro in modalità super user
 ip netns add ns1 #creo il namespace ns1
 ip netns add ns2 #creo il namespace ns2
@@ -61,8 +63,6 @@ exit #ritorno nel root
 ip netns exec ns2 /bin/bash #entro dentro ns2
 ip link #verifico che esiste solo l'interfaccia di loopback, senza IP
 exit #ritorno nel root
-ip netns exec ns1 ip link set lo up #attivo l'interfaccia di loopback nel namespace ns1
-ip netns exec ns2 ip link set lo up #attivo l'interfaccia di loopback nel namespace ns1
 ip link add veth-ns1 type veth peer name veth-ns2 #creo una coppia di interfacce virtuali collegate tra loro
 ip link #verifico che le interfacce siano state create
 ip link set veth-ns1 netns ns1 #sposto l'interfaccia veth-ns1 in ns1
@@ -80,7 +80,15 @@ ip addr add 10.0.1.20/24 dev veth-ns2 #assegno l'IP 10.0.1.20 a veth-ns2
 ip a #verifico che l'IP sia stato assegnato
 exit #ritorno nel root
 
-
+#Pulizia ARP
+#apro una shell per ns1
+sudo su #entro in modalità super user
+ip netns exec ns1 /bin/bash #entro dentro ns1
+ip netns exec ns1 ip neigh flush dev veth-ns1 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria 
+#apro una shell per ns2
+sudo su #entro in modalità super user
+ip netns exec ns2 /bin/bash #entro dentro ns2
+ip netns exec ns2 ip neigh flush dev veth-ns2 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria
 
 
 ## 5. Verifica del funzionamento
