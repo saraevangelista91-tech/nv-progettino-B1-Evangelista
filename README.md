@@ -90,11 +90,23 @@ sudo su #entro in modalità super user
 ip netns exec ns2 /bin/bash #entro dentro ns2
 ip netns exec ns2 ip neigh flush dev veth-ns2 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria
 
+Cattura del primo ping
+#shell ns2
+tcpdump -n -e -i veth-ns2 -w /tmp/cattura.pcap
+#shell ns1
+ping -c 3 10.0.1.20
+#nella barra degli indirizzi apro il file system della wsl file://wsl$/Ubuntu/tmp/
+#apro il file cattura.pcap con Wireshark
 
 ## 5. Verifica del funzionamento
 
 (I comandi/azioni di verifica che dimostrano che il progettino funziona:
 ping da X a Y, curl su porta Z, screenshot dell'output atteso, ecc.)
+
+Primo ping da ns2 a ns1
+La comunicazione tra ns2 e ns1 funziona correttamente: dalla shell di ns2 vedo che sono stati trasmessi e ricevuti 3 pacchetti 
+<img width="735" height="183" alt="image" src="https://github.com/user-attachments/assets/a6e0e169-9ec1-4c21-a228-b0722d6f274f" />
+
 
 ## 6. Riflessioni e punti aperti
 
