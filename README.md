@@ -18,12 +18,18 @@ PC - Indirizzo IPv4: 192.168.1.6
 PC - Indirizzo IPv6: fe80::7f79:523d:8fa1:3904%43
 Indirizzo fisico: 7C-8A-E1-C2-98-63
 Indirizzo IP pubblico: 2.39.112.7
+AS 30722 VODAFONE-IT-ASN, IT
 
 Router: 192.168.1.1
 
+WSL
+Interfaccia di loopback lo - IP 127.0.0.1/8
+Interfaccia eth0 - 172.26.235.190/20 #router virtuale dentro la VM root
+
+
 Due namespace e una sola rete /24:
 
-ns1 (10.0.1.10) ── veth-a ──────── veth-b ── (10.0.1.20) ns2
+ns1 (10.0.1.10) ── veth-ns1 ──────── veth-ns2 ── (10.0.1.20) ns2
                        rete 10.0.1.0/24
 ns1: ha un'interfaccia veth-ns1 con IP 10.0.1.10/24, link UP.
 ns2: ha un'interfaccia veth-ns2 con IP 10.0.1.20/24, link UP.
@@ -44,6 +50,19 @@ WSL2 Ubuntu 24.04, Docker Engine, VirtualBox 7.x, ecc. Indicare le versioni.)
 (Sequenza di comandi numerati che, eseguiti su un sistema con i prerequisiti,
 porta dal repo appena clonato allo stato in cui la demo "funziona".
 Ogni comando deve essere COMMENTATO con cosa ci si aspetta in output.)
+ip a #vedo le interfacce create
+sudo su #entro in modalità super user
+ip netns add ns2 #creo il namespace ns2
+ip netns add ns2 #creo il namespace ns2
+ip netns list #verifico che siano stati creati i namespace
+ip netns exec ns1 /bin/bash #entro dentro ns1
+ip link #verifico che esiste solo l'interfaccia di loopback, senza IP
+exit
+ip netns exec ns2 /bin/bash #entro dentro ns2
+ip link #verifico che esiste solo l'interfaccia di loopback, senza IP
+ip netns exec ns2 ip link set lo up
+ip netns exec ns2 ip link set lo up
+
 
 ## 5. Verifica del funzionamento
 
