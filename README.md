@@ -11,6 +11,16 @@ Capire a basso livello come funziona la comunicazione fra due network namespace 
 
 ## 2. Architettura
 
+WSL - Indirizzo IPv4: 172.26.224.1/20
+WSL - Indirizzo IPv6: fe80::7f79:523d:8fa1:3904%43
+
+PC - Indirizzo IPv4: 192.168.1.6
+PC - Indirizzo IPv6: fe80::7f79:523d:8fa1:3904%43
+Indirizzo fisico: 7C-8A-E1-C2-98-63
+Indirizzo IP pubblico: 2.39.112.7
+
+Router: 192.168.1.1
+
 Due namespace e una sola rete /24:
 
 ns1 (10.0.1.10) ── veth-a ──────── veth-b ── (10.0.1.20) ns2
