@@ -95,8 +95,16 @@ Cattura del primo ping
 tcpdump -n -e -i veth-ns2 -w /tmp/cattura.pcap
 #shell ns1
 ping -c 3 10.0.1.20
+ip neigh show #vedo che il MAC è stato associato a ns2 
 #nella barra degli indirizzi apro il file system della wsl file://wsl$/Ubuntu/tmp/
 #apro il file cattura.pcap con Wireshark
+
+#shell ns2
+tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap
+#shell ns1
+ping -c 2 10.0.1.20
+
+sudo ./scripts/teardown.sh #rimuove i namespace
 
 ## 5. Verifica del funzionamento
 
@@ -107,11 +115,25 @@ Primo ping da ns2 a ns1
 La comunicazione tra ns2 e ns1 funziona correttamente: dalla shell di ns2 vedo che sono stati trasmessi e ricevuti 3 pacchetti 
 <img width="735" height="183" alt="image" src="https://github.com/user-attachments/assets/a6e0e169-9ec1-4c21-a228-b0722d6f274f" />
 Analisi dei pacchetti scambiati
+
 Pacchetto 1 ARP-Request: ns1 non trova il MAC di ns1 e invia una richiesta a broadcast (IP 10.0.1.20 - MAC FF:FF:FF:FF:FF:FF) specificando il suo indirizzo (IP 10.0.1.10 - MAC 42:77:83:ae:be:92)
 <img width="1022" height="806" alt="image" src="https://github.com/user-attachments/assets/9539df9f-8d75-43a1-93ec-4563114f056d" />
+
 Pacchetto 2 ARP- Reply: ns2 riceve il pacchetto e risponde a ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) con il suo MAC (IP 10.0.1.20 - MAC 82:89:85:5e:d0:46)
 <img width="1021" height="885" alt="image" src="https://github.com/user-attachments/assets/f643ac5f-b9e6-41c0-8fe1-d76c9c2eb0fa" />
+La cache ARP ora contiene l'entry per 10.0.1.20 con il MAC di veth-ns2 (82:89:85:5e:d0:46) e può iniziare la comunicazione tramite protocollo ICMP
 
+Pacchetto 3 ICMP-ECO request: ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) testa la raggiungibilità di ns2 (IP 10.0.1.20 - MAC 82:89:85:5e:d0:46) inviando un payload casuale
+<img width="1899" height="695" alt="image" src="https://github.com/user-attachments/assets/99f42137-7745-4a19-9cfd-6a22fa497616" />
+
+Pacchetto 4 ICMP-ECO reply: ns2 (IP 10.0.1.20 - MAC 82:89:85:5e:d0:46) risponde positivamente a ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) rimandando indietro lo stesso contenuto
+<img width="1894" height="746" alt="image" src="https://github.com/user-attachments/assets/a4e812c1-722a-4107-827b-3ad7a5eb98e8" />
+
+Stessa cose per i pacchetti successivi 5-6 e 7-8
+<img width="1299" height="213" alt="image" src="https://github.com/user-attachments/assets/32f4ea92-7ba8-43b0-bf3a-1f08cf7c6e97" />
+
+Dopo il secondo ping da ns1 a ns2 vengono scambiati subito pacchetti ICMP poichè l'indirizzo MAC di ns2 è stato salvato da ns1
+<img width="1683" height="338" alt="image" src="https://github.com/user-attachments/assets/095fb1d1-7812-4173-860c-81bc351f4e21" />
 
 ## 6. Riflessioni e punti aperti
 
