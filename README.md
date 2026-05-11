@@ -169,9 +169,7 @@ Dopo il secondo ping da ns1 a ns2 vengono scambiati subito pacchetti ICMP poich�
 
 ## 6. Riflessioni e punti aperti
 
-(Cosa hai scoperto facendolo, eventuali difficoltà incontrate, cosa
-miglioreresti, eventuali domande aperte. Non è un riempitivo: è la
-parte che meglio mostra che hai capito ciò che hai fatto.)
+Ho avuto difficoltà a capire come creare ed eseguire i file setup.sh e teardown.sh.
 
 - Cosa succede se assegno a ns2 un IP fuori dalla /24 di ns1 (es. 10.0.2.20/24)? essendo su reti diversi, 10.0.2.20/24 non è raggiungibile, se non tramite router
 <img width="571" height="57" alt="image" src="https://github.com/user-attachments/assets/167b4e54-fd54-4699-91b3-95fc20c880ed" />
@@ -180,7 +178,7 @@ parte che meglio mostra che hai capito ciò che hai fatto.)
 
 - Tra il primo e il secondo ping, dopo quanto tempo la cache ARP si "scorda" l'entry, e da cosa dipende? (cenni a arp_table_timeout, gc_thresh). L'associazione IP-MAC non viene salvata indefinitimanente nella cache ARP, ma rimane valida solo per un certo tempo (ARP cache timeout), nel nostro esempio circa 2o secondi. Quando il timer scade l’entry diventa STALE: può ancora essere usata, ma al successivo traffico Linux può inviare una nuova ARP Request per verificare che il MAC sia ancora valido (lo stato può essere verificato tramite il comando ip neigh). Inoltre se la cache ARP cresce troppo, tramite la definizione di 3 threshold (gc_thresh1 per la pulizia leggera, gc_thresh2 per una pulizia più aggressiva e gc_thresh3 come soglia più restrittiva),  si attiva la garbage collection, per cui il kernel elimina entry vecchie o inutilizzate o può scartare nuove entry se è pieno.
 
-- Questo schema (due namespace direttamente connessi) è quello che usa Docker quando crea due container nella stessa rete bridge di default? Quasi, ma c'è un pezzo in più — quale? (Spoiler: il bridge Linux fa da switch.) Docker, quando crea più container nella stessa rete bridge di default, aggiunge un elemento fondamentale in più: un bridge Linux (docker0) che funziona come uno switch Ethernet virtuale. Ogni container non è collegato direttamente agli altri, ma ha una sua veth pair: un’estremità sta nel namespace del container, l’altra finisce nel bridge. Il bridge poi si occupa di inoltrare i frame tra tutti i container collegati, permettendo comunicazioni multiple e comportandosi come una LAN reale, con supporto a broadcast e ARP. Quindi la veth pair collega container e host, ma è il bridge a rendere possibile la rete condivisa tra più container.
+- Questo schema (due namespace direttamente connessi) è quello che usa Docker quando crea due container nella stessa rete bridge di default? Quasi, ma c'è un pezzo in più — quale? (Spoiler: il bridge Linux fa da switch.) Docker, quando crea più container nella stessa rete bridge di default, aggiunge un elemento fondamentale in più: un bridge Linux (docker0) che funziona come uno switch Ethernet virtuale. Ogni container non è collegato direttamente agli altri, ma ha una sua veth pair: un’estremità sta nel namespace del container, l’altra finisce nel bridge. Il bridge poi si occupa di inoltrare i frame tra tutti i container collegati, permettendo comunicazioni multiple e comportandosi come una LAN reale. Quindi la veth pair collega container e host, ma è il bridge a rendere possibile la rete condivisa tra più container.
 
 ## 7. Riferimenti
 Slide del corso itp-2526-HandsOn
