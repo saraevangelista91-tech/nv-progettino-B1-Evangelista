@@ -54,28 +54,39 @@ ip a #verifico che l'IP sia stato assegnato
 exit #ritorno nel root
 
 #Pulizia ARP
+
 #apro una shell per ns1
+
 sudo su #entro in modalità super user
 ip netns exec ns1 /bin/bash #entro dentro ns1
 ip netns exec ns1 ip neigh flush dev veth-ns1 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria 
 ip neigh show
-#apro una shell per ns2
+
+#apro una shell per ns2ù
+
 sudo su #entro in modalità super user
 ip netns exec ns2 /bin/bash #entro dentro ns2
 ip netns exec ns2 ip neigh flush dev veth-ns2 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria
 ip neigh show
 
-Cattura del primo ping
+#Cattura del primo ping
+
 #shell ns2
+
 tcpdump -n -e -i veth-ns2 -w /tmp/cattura.pcap #catturo i pacchetti e li salvo in un file cattura.pcap
+
 #shell ns1
+
 ping -c 3 10.0.1.20 #pingo ns2
-ip neigh show #vedo che il MAC è stato associato a ns2 
+ip neigh show #vedo che il MAC è stato associato a ns2
+
 #nella barra degli indirizzi apro il file system della wsl file://wsl$/Ubuntu/tmp/
 #apro il file cattura.pcap con Wireshark
 
 #shell ns2
+
 tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap #catturo i pacchetti e li salvo in un file cattura2.pcap
+
 #shell ns1
 ping -c 2 10.0.1.20 #pingo ns2
 
