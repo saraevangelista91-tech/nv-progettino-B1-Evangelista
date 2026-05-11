@@ -67,17 +67,17 @@ ip neigh show
 
 Cattura del primo ping
 #shell ns2
-tcpdump -n -e -i veth-ns2 -w /tmp/cattura.pcap
+tcpdump -n -e -i veth-ns2 -w /tmp/cattura.pcap #catturo i pacchetti e li salvo in un file cattura.pcap
 #shell ns1
-ping -c 3 10.0.1.20
+ping -c 3 10.0.1.20 #pingo ns2
 ip neigh show #vedo che il MAC è stato associato a ns2 
 #nella barra degli indirizzi apro il file system della wsl file://wsl$/Ubuntu/tmp/
 #apro il file cattura.pcap con Wireshark
 
 #shell ns2
-tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap
+tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap #catturo i pacchetti e li salvo in un file cattura2.pcap
 #shell ns1
-ping -c 2 10.0.1.20
+ping -c 2 10.0.1.20 #pingo ns2
 
 sudo ./scripts/teardown.sh #rimuove i namespace
 
