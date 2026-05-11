@@ -129,7 +129,7 @@ La comunicazione tra ns2 e ns1 funziona correttamente: dalla shell di ns2 vedo c
 <img width="735" height="183" alt="image" src="https://github.com/user-attachments/assets/a6e0e169-9ec1-4c21-a228-b0722d6f274f" />
 Analisi dei pacchetti scambiati
 
-Pacchetto 1 ARP-Request: ns1 non trova il MAC di ns1 e invia una richiesta a broadcast (IP 10.0.1.20 - MAC FF:FF:FF:FF:FF:FF) specificando il suo indirizzo (IP 10.0.1.10 - MAC 42:77:83:ae:be:92)
+Pacchetto 1 ARP-Request: ns1 non trova il MAC di ns2 e invia una richiesta a broadcast (IP 10.0.1.20 - MAC FF:FF:FF:FF:FF:FF) specificando il suo indirizzo (IP 10.0.1.10 - MAC 42:77:83:ae:be:92)
 <img width="1022" height="806" alt="image" src="https://github.com/user-attachments/assets/9539df9f-8d75-43a1-93ec-4563114f056d" />
 
 Pacchetto 2 ARP- Reply: ns2 riceve il pacchetto e risponde a ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) con il suo MAC (IP 10.0.1.20 - MAC 82:89:85:5e:d0:46)
