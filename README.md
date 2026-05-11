@@ -127,6 +127,7 @@ sudo ./scripts/teardown.sh #rimuove i namespace
 Primo ping da ns2 a ns1
 La comunicazione tra ns2 e ns1 funziona correttamente: dalla shell di ns2 vedo che sono stati trasmessi e ricevuti 3 pacchetti 
 <img width="735" height="183" alt="image" src="https://github.com/user-attachments/assets/a6e0e169-9ec1-4c21-a228-b0722d6f274f" />
+
 Analisi dei pacchetti scambiati
 
 Pacchetto 1 ARP-Request: ns1 non trova il MAC di ns2 e invia una richiesta a broadcast (IP 10.0.1.20 - MAC FF:FF:FF:FF:FF:FF) specificando il suo indirizzo (IP 10.0.1.10 - MAC 42:77:83:ae:be:92)
@@ -134,7 +135,8 @@ Pacchetto 1 ARP-Request: ns1 non trova il MAC di ns2 e invia una richiesta a bro
 
 Pacchetto 2 ARP- Reply: ns2 riceve il pacchetto e risponde a ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) con il suo MAC (IP 10.0.1.20 - MAC 82:89:85:5e:d0:46)
 <img width="1021" height="885" alt="image" src="https://github.com/user-attachments/assets/f643ac5f-b9e6-41c0-8fe1-d76c9c2eb0fa" />
-La cache ARP ora contiene l'entry per 10.0.1.20 con il MAC di veth-ns2 (82:89:85:5e:d0:46) e può iniziare la comunicazione tramite protocollo ICMP
+
+La cache ARP ora contiene l'associazione IP (10.0.1.20) - MAC (82:89:85:5e:d0:46) per ns2 e può iniziare la comunicazione tramite protocollo ICMP
 
 Pacchetto 3 ICMP-ECO request: ns1 (IP 10.0.1.10 - MAC 42:77:83:ae:be:92) testa la raggiungibilità di ns2 (IP 10.0.1.20 - MAC 82:89:85:5e:d0:46) inviando un payload casuale
 <img width="1899" height="695" alt="image" src="https://github.com/user-attachments/assets/99f42137-7745-4a19-9cfd-6a22fa497616" />
