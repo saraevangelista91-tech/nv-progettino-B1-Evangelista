@@ -22,6 +22,7 @@ Per ripordurre il lavoro, bisogna aver installati WSL2 Ubuntu 24.04 e Wireshark
 (Sequenza di comandi numerati che, eseguiti su un sistema con i prerequisiti,
 porta dal repo appena clonato allo stato in cui la demo "funziona".
 Ogni comando deve essere COMMENTATO con cosa ci si aspetta in output.)
+
 #Costruzione dell'architettura
 
 ip a #vedo le interfacce nella wsl
