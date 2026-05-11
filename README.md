@@ -15,8 +15,7 @@ Capire a basso livello come funziona la comunicazione fra due network namespace 
 
 ## 3. Prerequisiti
 
-(Cosa deve avere installato chi vuole riprodurre il tuo lavoro:
-WSL2 Ubuntu 24.04, Docker Engine, VirtualBox 7.x, ecc. Indicare le versioni.)
+Per ripordurre il lavoro, bisogna aver installati WSL2 Ubuntu 24.04 e Wireshark
 
 ## 4. Come riprodurre passo-passo
 
