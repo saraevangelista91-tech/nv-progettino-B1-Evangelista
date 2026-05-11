@@ -120,7 +120,9 @@ tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap #catturo i pacchetti e li salvo 
 
 ping -c 2 10.0.1.20 #pingo ns2
 
-sudo ./scripts/teardown.sh #rimuove i namespace
+Per eseguire da script: 
+sudo ./setup.sh #per configurare la rete
+sudo ./teardown.sh #per pulire
 
 ## 5. Verifica del funzionamento
 
