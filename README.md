@@ -83,7 +83,7 @@ sudo su #entro in modalità super user
 
 ip netns exec ns1 /bin/bash #entro dentro ns1
 
-ip netns exec ns1 ip neigh flush dev veth-ns1 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria 
+ip neigh flush dev veth-ns1 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria 
 
 ip neigh show #controllo che l'associazione non ci sia
 
@@ -93,7 +93,7 @@ sudo su #entro in modalità super user
 
 ip netns exec ns2 /bin/bash #entro dentro ns2
 
-ip netns exec ns2 ip neigh flush dev veth-ns2 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria
+ip neigh flush dev veth-ns2 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria
 
 ip neigh show
 
@@ -101,7 +101,7 @@ ip neigh show
 
 #shell ns2
 
-tcpdump -n -e -i veth-ns2 -w /tmp/cattura.pcap #catturo i pacchetti e li salvo in un file cattura.pcap
+tcpdump -n -e -i veth-ns2 -w /tmp/catturapack.pcap #catturo i pacchetti e li salvo in un file catturapack.pcap
 
 #shell ns1
 
@@ -110,21 +110,36 @@ ping -c 3 10.0.1.20 #pingo ns2
 ip neigh show #vedo che il MAC è stato associato a ns2
 
 #nella barra degli indirizzi apro il file system della wsl file://wsl$/Ubuntu/tmp/
-#apro il file cattura.pcap con Wireshark
+#apro il file catturapack.pcap con Wireshark
 
 #shell ns2
 
-tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap #catturo i pacchetti e li salvo in un file cattura2.pcap
+tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap #catturo i pacchetti e li salvo in un file catturapack2.pcap
 
 #shell ns1
 
 ping -c 2 10.0.1.20 #pingo ns2
 
 Per eseguire da script: 
-sudo ./setup.sh #per configurare la rete
-sudo ./teardown.sh #per pulire
+sudo ./setup2.sh #per configurare la rete
+sudo ./teardown2.sh #per pulire
 
 ## 5. Verifica del funzionamento
+
+Creazione namespace
+
+I namespace ns1 e ns2 sono stati creati
+
+<img width="514" height="67" alt="image" src="https://github.com/user-attachments/assets/befc8cb2-c80b-4891-b276-5c09e040f4e5" />
+
+Interfacce
+
+<img width="981" height="258" alt="image" src="https://github.com/user-attachments/assets/c454ba87-7a2a-4637-900e-83e618cd181a" />
+<img width="997" height="266" alt="image" src="https://github.com/user-attachments/assets/5cac0928-de2e-49fa-bc79-99b2659b799e" />
+
+
+Cache ARP prima del ping
+<img width="673" height="63" alt="image" src="https://github.com/user-attachments/assets/6830709b-5842-40f3-9e05-55eaae765154" />
 
 Primo ping da ns2 a ns1
 La comunicazione tra ns2 e ns1 funziona correttamente: dalla shell di ns2 vedo che sono stati trasmessi e ricevuti 3 pacchetti 
@@ -163,7 +178,7 @@ parte che meglio mostra che hai capito ciò che hai fatto.)
 
 - E se invece dimentico di mettere su up una delle due interfacce? Cosa vede ping e cosa vede tcpdump (sull'altro lato)? se un lato è down, è come se il cavo virtuale fosse scollegato da una parte. Il ping da ns1 a ns2 fa inviare un pacchetto ARP-Request da ns1 che però non viene ricevuto da ns2 e il ping fallisce per mancanza di ARP reply. tcpdump su ns2 non cattura nulla perchè non riceve nulla
 
-- Tra il primo e il secondo ping, dopo quanto tempo la cache ARP si "scorda" l'entry, e da cosa dipende? (cenni a arp_table_timeout, gc_thresh). L'associazione IP-MAC non viene salvata indefinitimanente nella cache ARP, ma rimane valida solo per un certo tempo (ARP cache timeout). Quando il timer scade l’entry diventa STALE: può ancora essere usata, ma al successivo traffico Linux può inviare una nuova ARP Request per verificare che il MAC sia ancora valido (lo stato può essere verificato tramite il comando ip neigh). Inoltre se la cache ARP cresce troppo, tramite la definizione di 3 threshold (gc_thresh1 per la pulizia leggera, gc_thresh2 per una pulizia più aggressiva e gc_thresh3 come soglia più restrittiva),  si attiva la garbage collection, per cui il kernel elimina entry vecchie o inutilizzate o può scartare nuove entry se è pieno.
+- Tra il primo e il secondo ping, dopo quanto tempo la cache ARP si "scorda" l'entry, e da cosa dipende? (cenni a arp_table_timeout, gc_thresh). L'associazione IP-MAC non viene salvata indefinitimanente nella cache ARP, ma rimane valida solo per un certo tempo (ARP cache timeout), nel nostro esempio circa 2o secondi. Quando il timer scade l’entry diventa STALE: può ancora essere usata, ma al successivo traffico Linux può inviare una nuova ARP Request per verificare che il MAC sia ancora valido (lo stato può essere verificato tramite il comando ip neigh). Inoltre se la cache ARP cresce troppo, tramite la definizione di 3 threshold (gc_thresh1 per la pulizia leggera, gc_thresh2 per una pulizia più aggressiva e gc_thresh3 come soglia più restrittiva),  si attiva la garbage collection, per cui il kernel elimina entry vecchie o inutilizzate o può scartare nuove entry se è pieno.
 
 - Questo schema (due namespace direttamente connessi) è quello che usa Docker quando crea due container nella stessa rete bridge di default? Quasi, ma c'è un pezzo in più — quale? (Spoiler: il bridge Linux fa da switch.) Docker, quando crea più container nella stessa rete bridge di default, aggiunge un elemento fondamentale in più: un bridge Linux (docker0) che funziona come uno switch Ethernet virtuale. Ogni container non è collegato direttamente agli altri, ma ha una sua veth pair: un’estremità sta nel namespace del container, l’altra finisce nel bridge. Il bridge poi si occupa di inoltrare i frame tra tutti i container collegati, permettendo comunicazioni multiple e comportandosi come una LAN reale, con supporto a broadcast e ARP. Quindi la veth pair collega container e host, ma è il bridge a rendere possibile la rete condivisa tra più container.
 
