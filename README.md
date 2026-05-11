@@ -10,34 +10,8 @@ Capire a basso livello come funziona la comunicazione fra due network namespace 
 
 ## 2. Architettura
 
-WSL - Indirizzo IPv4: 172.26.224.1/20
-WSL - Indirizzo IPv6: fe80::7f79:523d:8fa1:3904%43
+<img width="976" height="644" alt="image" src="https://github.com/user-attachments/assets/0555572e-f32c-44b3-bf41-5df93c71f9b8" />
 
-PC - Indirizzo IPv4: 192.168.1.6
-PC - Indirizzo IPv6: fe80::7f79:523d:8fa1:3904%43
-Indirizzo fisico: 7C-8A-E1-C2-98-63
-Indirizzo IP pubblico: 2.39.112.7
-AS 30722 VODAFONE-IT-ASN, IT
-
-Router: 192.168.1.1
-
-WSL
-Interfaccia di loopback lo - IP 127.0.0.1/8
-Interfaccia eth0 - 172.26.235.190/20 #router virtuale dentro la VM root
-
-
-Due namespace e una sola rete /24:
-
-ns1 (10.0.1.10) ── veth-ns1 ──────── veth-ns2 ── (10.0.1.20) ns2
-                       rete 10.0.1.0/24
-ns1: ha un'interfaccia veth-ns1 con IP 10.0.1.10/24, link UP.
-ns2: ha un'interfaccia veth-ns2 con IP 10.0.1.20/24, link UP.
-Nessun router, nessun NAT, nessuna default route necessaria (sono nella stessa rete).
-Tutto deve essere creato/distrutto da due script bash: scripts/setup.sh (idempotente) e scripts/teardown.sh (rimuove namespace e veth).
-
-(Descrizione delle componenti — container, VM, namespace, reti — e di
-come comunicano tra loro. Una piccola figura ASCII art o un'immagine in
-screenshots/ aiutano molto.)
 
 ## 3. Prerequisiti
 
