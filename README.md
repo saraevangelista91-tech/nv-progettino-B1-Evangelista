@@ -19,38 +19,60 @@ Per ripordurre il lavoro, bisogna aver installati WSL2 Ubuntu 24.04 e Wireshark
 
 ## 4. Come riprodurre passo-passo
 
-(Sequenza di comandi numerati che, eseguiti su un sistema con i prerequisiti,
-porta dal repo appena clonato allo stato in cui la demo "funziona".
-Ogni comando deve essere COMMENTATO con cosa ci si aspetta in output.)
-
 #Costruzione dell'architettura
 
 ip a #vedo le interfacce nella wsl
+
 sudo su #entro in modalità super user
+
 ip netns add ns1 #creo il namespace ns1
+
 ip netns add ns2 #creo il namespace ns2
+
 ip netns list #verifico che siano stati creati i namespace
+
 ip netns exec ns1 /bin/bash #entro dentro ns1
+
 ip link #verifico che esiste solo l'interfaccia di loopback, senza IP
+
 exit #ritorno nel root
+
 ip netns exec ns2 /bin/bash #entro dentro ns2
+
 ip link #verifico che esiste solo l'interfaccia di loopback, senza IP
+
 exit #ritorno nel root
+
 ip link add veth-ns1 type veth peer name veth-ns2 #creo una coppia di interfacce virtuali collegate tra loro
+
 ip link #verifico che le interfacce siano state create
+
 ip link set veth-ns1 netns ns1 #sposto l'interfaccia veth-ns1 in ns1
+
 ip netns exec ns1 /bin/bash #entro dentro ns1
+
 ip link #verifico che esiste veth-ns1
+
 ip link set veth-ns1 up #attivo l'interfaccia veth-ns1
+
 ip addr add 10.0.1.10/24 dev veth-ns1 #assegno l'IP 10.0.1.10 a veth-ns1
+
 ip a #verifico che l'IP sia stato assegnato
+
 exit #ritorno nel root
+
 ip link set veth-ns2 netns ns2 #sposto l'interfaccia veth-ns2 in ns2
+
 ip netns exec ns2 /bin/bash #entro dentro ns2
+
 ip link #verifico che esiste veth-ns2
+
 ip link set veth-ns2 up #attivo l'interfaccia veth-ns2
+
 ip addr add 10.0.1.20/24 dev veth-ns2 #assegno l'IP 10.0.1.20 a veth-ns2
+
 ip a #verifico che l'IP sia stato assegnato
+
 exit #ritorno nel root
 
 #Pulizia ARP
@@ -58,15 +80,21 @@ exit #ritorno nel root
 #apro una shell per ns1
 
 sudo su #entro in modalità super user
-ip netns exec ns1 /bin/bash #entro dentro ns1
-ip netns exec ns1 ip neigh flush dev veth-ns1 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria 
-ip neigh show
 
-#apro una shell per ns2ù
+ip netns exec ns1 /bin/bash #entro dentro ns1
+
+ip netns exec ns1 ip neigh flush dev veth-ns1 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria 
+
+ip neigh show #controllo che l'associazione non ci sia
+
+#apro una shell per ns2
 
 sudo su #entro in modalità super user
+
 ip netns exec ns2 /bin/bash #entro dentro ns2
+
 ip netns exec ns2 ip neigh flush dev veth-ns2 #elimino l'associazione indirizzo IP - indirizzo MAC dalla memoria
+
 ip neigh show
 
 #Cattura del primo ping
@@ -78,6 +106,7 @@ tcpdump -n -e -i veth-ns2 -w /tmp/cattura.pcap #catturo i pacchetti e li salvo i
 #shell ns1
 
 ping -c 3 10.0.1.20 #pingo ns2
+
 ip neigh show #vedo che il MAC è stato associato a ns2
 
 #nella barra degli indirizzi apro il file system della wsl file://wsl$/Ubuntu/tmp/
@@ -88,14 +117,12 @@ ip neigh show #vedo che il MAC è stato associato a ns2
 tcpdump -n -e -i veth-ns2 -w /tmp/cattura2.pcap #catturo i pacchetti e li salvo in un file cattura2.pcap
 
 #shell ns1
+
 ping -c 2 10.0.1.20 #pingo ns2
 
 sudo ./scripts/teardown.sh #rimuove i namespace
 
 ## 5. Verifica del funzionamento
-
-(I comandi/azioni di verifica che dimostrano che il progettino funziona:
-ping da X a Y, curl su porta Z, screenshot dell'output atteso, ecc.)
 
 Primo ping da ns2 a ns1
 La comunicazione tra ns2 e ns1 funziona correttamente: dalla shell di ns2 vedo che sono stati trasmessi e ricevuti 3 pacchetti 
